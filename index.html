@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gigi</title>
+  <style>body{margin:0;background:#000;overflow:hidden}header,aside{position:fixed}header{fill:white;color:white}header svg{cursor:pointer}aside{display:flex;flex-direction:column;top:2rem;width:50%;height:calc(100vh - 2rem)}aside div{display:flex;flex-direction:column;flex:auto}aside textarea{flex:auto;background:none;color:white}.hidden{display:none}footer{flex:none;color:white;padding:.5rem}footer a{color:crimson}</style>
+  <script type="module" src="main.js" defer></script>
+</head>
+<body>
+  <header>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="24"
+      width="24"
+      viewBox="0 -960 960 960"
+      onclick="sidebar.classList.toggle('hidden');"
+    >
+      <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+    </svg>
+  </header>
+
+  <aside id="sidebar" class="hidden">
+    <div>
+      <textarea id="t_kanji">こんにちは世界</textarea>
+      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+    </div>
+    <div>
+      <textarea id="t_vertex">
+      precision highp float;
+
+      attribute vec3 position;
+      attribute vec3 next;
+      attribute vec3 prev;
+      attribute vec2 uv;
+      attribute float side;
+
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform vec2 uResolution;
+      uniform float uDPR;
+      uniform float uThickness;
+      uniform float uPct;
+
+      vec4 getPosition() {
+          mat4 mvp = projectionMatrix * modelViewMatrix;
+          vec4 current = mvp * vec4(position, 1);
+
+          vec2 aspect = vec2(uResolution.x / uResolution.y, 1);
+          vec2 nextScreen = next.xy * aspect;
+          vec2 prevScreen = prev.xy * aspect;
+
+          // Calculate the tangent direction
+          vec2 tangent = normalize(nextScreen - prevScreen);
+
+          // Rotate 90 degrees to get the normal
+          vec2 normal = vec2(-tangent.y, tangent.x);
+          normal /= aspect;
+
+          // draw the line
+          normal *= mix(1.0, 0.0, atan(uv.y / uPct));
+
+          float pixelWidthRatio = 1.0 / (uResolution.y / uDPR);
+          float pixelWidth = current.w * pixelWidthRatio;
+          normal *= pixelWidth * uThickness;
+          current.xy -= normal * side;
+
+          return current;
+      }
+
+      void main() {
+          gl_Position = getPosition();
+      }
+      </textarea>
+      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+    </div>
+    <div>
+      <textarea id="t_fragment">
+      precision highp float;
+
+      uniform vec3 uColor;
+      uniform float uPct;
+
+      void main() {
+          if (uPct <= 0.0) {
+              discard;
+          }
+          gl_FragColor.rgb = uColor;
+          gl_FragColor.a = 1.0;
+      }
+      </textarea>
+      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+    </div>
+    <footer>
+      hack it -> <a href="https://github.com/rayuruno/kaku" target="_blank">https://github.com/rayuruno/kaku</a>
+      <br>
+      kanji source -> <a href="https://github.com/KanjiVG/kanjivg" target="_blank">https://github.com/KanjiVG/kanjivg</a>
+      <br>
+      3d engine -> <a href="https://github.com/oframe/ogl/" target="_blank">https://github.com/oframe/ogl/</a>
+      <br>
+      svg parser -> <a href="https://github.com/hughsk/svg-path-parser" target="_blank">https://github.com/hughsk/svg-path-parser</a>
+    </footer>
+  </aside>
+
+  <main></main>
+</body>
+</html>
