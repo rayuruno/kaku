@@ -1,6 +1,6 @@
-import { parseSVG, makeSVGPathCommandsAbsolute } from '/parser.js';
+import { parseSVG, makeSVGPathCommandsAbsolute } from './parser.js';
 
-const index = await fetch("/data/kvg-index.json").then(r => r.json());
+const index = await fetch("./data/kvg-index.json").then(r => r.json());
 
 export function loadAndParseFromChar(char) {
   let kvg = index[char];

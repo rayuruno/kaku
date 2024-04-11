@@ -1,5 +1,5 @@
 import { Renderer, Camera, Orbit, Transform, Polyline, Mesh, Curve, Vec3, Color, Program } from 'https://unpkg.com/ogl';
-import { loadAndParseFromChar } from "/kanji.js";
+import { loadAndParseFromChar } from "./kanji.js";
 
 // setup
 let renderer, gl, camera, scene;
