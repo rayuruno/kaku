@@ -19,7 +19,7 @@ export function loadAndParseFromChar(char) {
 }
 
 function loadSVG(kvg) {
-  return fetch(`/data/kanji/${kvg[0]}`).then(r => r.text());
+  return fetch(`./data/kanji/${kvg[0]}`).then(r => r.text());
 }
 
 function parseSVGString(svgStr) {
