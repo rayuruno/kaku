@@ -1,5 +1,4 @@
-// import { SVGPathData } from './svgpd.js';
-import { parseSVG, makeSVGPathCommandsAbsolute } from './parser.js';
+import { parseSVG, makeSVGPathCommandsAbsolute } from '/parser.js';
 
 const index = await fetch("/data/kvg-index.json").then(r => r.json());
 
