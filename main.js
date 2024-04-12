@@ -15,8 +15,9 @@ let $main = document.querySelector('main'),
     $fragment = document.querySelector('#t_fragment');
 
 window.addEventListener('update', () => {
-  if(location.hash != $kanji.value) {
-    location.hash = encodeURIComponent($kanji.value);
+  let value = encodeURIComponent($kanji.value)
+  if(location.hash.substring(1) != value) {
+    location.hash = value;
   }
   update();
 });
