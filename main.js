@@ -1,48 +1,64 @@
-import { Renderer, Camera, Orbit, Transform, Polyline, Mesh, Curve, Vec3, Color, Program } from 'https://unpkg.com/ogl';
+import { Renderer, Camera, Orbit, Transform, Polyline, Mesh, Curve, Vec3, Color, Program } from './vendor/ogl/index.js';
 import { loadAndParseFromChar } from "./kanji.js";
 
 // setup
-let renderer, gl, camera, scene;
-
 const colSize = 2.0;
 const rowSize = 2.0;
 const speed = 1.4;
 
-let controls, col, row, lines, pct, timer;
+let renderer, gl, camera, scene, controls, col, row, lines, pct, timer;
 
+let $main = document.querySelector('main'),
+    $sidebar = document.querySelector("#sidebar"),
+    $kanji = document.querySelector("#t_kanji"),
+    $vertex = document.querySelector('#t_vertex'),
+    $fragment = document.querySelector('#t_fragment');
+
+window.addEventListener('update', () => {
+  if(location.hash != $kanji.value) {
+    location.hash = $kanji.value;
+  }
+  update();
+});
+window.addEventListener('hashchange', () => {
+  update();
+});
 window.addEventListener('resize', resize, false);
-window.addEventListener('kaku', () => {
-  let k = document.querySelector('#t_kanji').value;
-  write(k);
-  location.hash = k;
+window.addEventListener('sidebar', () => {
+  $sidebar.classList.toggle('hidden');
+});
+[$kanji,$vertex,$fragment].forEach(el => {
+  el.addEventListener('focus', () => {
+    toggle3DControls(false);
+  });
 
-})
+  el.addEventListener('blur', () => {
+    toggle3DControls(true);
+  });
+});
 
-// 千佳先生\nお誕生日\nおめでとう\nございます
-// 千佳先生%0Aお誕生日%0Aおめでとう%0Aございます
-// https://localhost:8090/#%E5%8D%83%E4%BD%B3%E5%85%88%E7%94%9F%0A%E3%81%8A%E8%AA%95%E7%94%9F%E6%97%A5%0A%E3%81%8A%E3%82%81%E3%81%A7%E3%81%A8%E3%81%86%0A%E3%81%94%E3%81%96%E3%81%84%E3%81%BE%E3%81%99
-// https://localhost:8090/#千佳先生%0Aお誕生日%0Aおめでとう%0Aございます
-let k = location.hash.substring(1);
-if (k) {
-  document.querySelector("#t_kanji").value = decodeURIComponent(k);
-}
-
-write(document.querySelector("#t_kanji").value);
-
-document.querySelector("#sidebar").addEventListener('mouseenter', disable3DControl)
-document.querySelector("#sidebar").addEventListener('focus', disable3DControl)
-document.querySelector("#sidebar").addEventListener('mouseleave', enable3DControl)
-document.querySelector("#sidebar").addEventListener('blur', enable3DControl)
+update();
 
 //
 
-function disable3DControl() {
-  if (!controls) return;
-  controls.enabled = false;
+function resize() {
+  if (renderer && camera && gl) {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+  }
 }
-function enable3DControl() {
+
+function toggle3DControls(enabled) {
   if (!controls) return;
-  controls.enabled = true;
+  controls.enabled = enabled;
+}
+
+function update() {
+  let k = location.hash.substring(1);
+  if (k) {
+    $kanji.value = decodeURIComponent(k);
+  }
+  write($kanji.value);
 }
 
 async function write(input) {
@@ -58,12 +74,12 @@ async function parseInput(value) {
 }
 
 function draw(characters) {
-  document.querySelector('main').innerHTML = '';
+  $main.innerHTML = '';
   if (timer) {clearTimeout(timer)}
 
   renderer = new Renderer({ dpr: 2 });
   gl = renderer.gl;
-  document.querySelector('main').replaceChildren(gl.canvas);
+  $main.replaceChildren(gl.canvas);
 
   camera = new Camera(gl, { fov: 35 });
   scene = new Transform();
@@ -88,9 +104,9 @@ function draw(characters) {
 
     data.forEach((cd) => {
       let curves = makeCurves(cd);
-      let firstCurve = curves[0];
-      let lastCurve = curves[curves.length-1];
-      let len = firstCurve.points[0].distance(lastCurve.points[lastCurve.points.length-1]);
+      let fPoints = curves[0].points;
+      let lPoints = curves[curves.length-1].points;
+      let len = fPoints[0].distance(lPoints[lPoints.length-1]);
       let poly = makePolyline(makePoints(curves));
       lines.push({poly, len});
       poly.mesh.setParent(grp);
@@ -105,26 +121,21 @@ function draw(characters) {
   controls = new Orbit(camera, {
       target: new Vec3(0, 0, 0),
   });
-  tick(lines.shift());
-}
 
-function resize() {
-  if (renderer && camera && gl) {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
-  }
+  tick(lines.shift());
 }
 
 function tick(line) {
   timer = setTimeout(() => {
     pct += speed / line.len;
-    update(line.poly, pct * 0.01);
+    line.poly.program.uniforms.uPct.value = pct * 0.01;
+    render();
 
     if (pct >= 100) {
       pct = 0;
       line = lines.shift();
       if (!line) {
-        render();
+        play();
         return;
       }
     }
@@ -132,17 +143,14 @@ function tick(line) {
   }, 60/1000);
 }
 
-function update(polyline, pct) {
-    polyline.program.uniforms.uPct.value = pct;
-    controls.update();
-    renderer.render({ scene, camera });
+function render() {
+  controls.update();
+  renderer.render({ scene, camera });
 }
 
-function render() {
-    requestAnimationFrame(render);
-
-    controls.update();
-    renderer.render({ scene, camera });
+function play() {
+  requestAnimationFrame(play);
+  render();
 }
 
 function makeCurves(data) {
@@ -178,17 +186,12 @@ function makePoints(curves) {
 function makePolyline(points) {
   return new Polyline(gl, {
       points,
-      vertex: document.querySelector('#t_vertex').value,
-      fragment: document.querySelector('#t_fragment').value,
+      vertex: $vertex.value,
+      fragment: $fragment.value,
       uniforms: {
           uColor: { value: new Color('#f00') },
           uThickness: { value: 10 },
           uPct: { value: 0 },
       },
   });
-}
-
-function random(a, b) {
-    const alpha = Math.random();
-    return a * (1.0 - alpha) + b * alpha;
 }

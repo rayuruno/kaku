@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>gigi</title>
+  <title>kaku</title>
   <style>body{margin:0;background:#000;overflow:hidden}header,aside{position:fixed}header{fill:white;color:white}header svg{cursor:pointer}aside{display:flex;flex-direction:column;top:2rem;width:50%;height:calc(100vh - 2rem)}aside div{display:flex;flex-direction:column;flex:auto}aside textarea{flex:auto;background:none;color:white}.hidden{display:none}footer{flex:none;color:white;padding:.5rem}footer a{color:crimson}</style>
   <script type="module" src="./main.js" defer></script>
 </head>
@@ -14,7 +14,7 @@
       height="24"
       width="24"
       viewBox="0 -960 960 960"
-      onclick="sidebar.classList.toggle('hidden');"
+      onclick="window.dispatchEvent(new Event('sidebar'));"
     >
       <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
     </svg>
@@ -23,7 +23,7 @@
   <aside id="sidebar" class="hidden">
     <div>
       <textarea id="t_kanji">こんにちは世界</textarea>
-      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+      <button onclick="window.dispatchEvent(new Event('update'));">書け</button>
     </div>
     <div>
       <textarea id="t_vertex">
@@ -72,7 +72,7 @@
           gl_Position = getPosition();
       }
       </textarea>
-      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+      <button onclick="window.dispatchEvent(new Event('update'));">書け</button>
     </div>
     <div>
       <textarea id="t_fragment">
@@ -89,7 +89,7 @@
           gl_FragColor.a = 1.0;
       }
       </textarea>
-      <button onclick="window.dispatchEvent(new Event('kaku'));">書け</button>
+      <button onclick="window.dispatchEvent(new Event('update'));">書け</button>
     </div>
     <footer>
       hack it -> <a href="https://github.com/rayuruno/kaku" target="_blank">https://github.com/rayuruno/kaku</a>
