@@ -74,7 +74,7 @@ async function parseInput(value) {
 }
 
 function draw(characters) {
-  $main.innerHTML = '';
+  gl?.canvas?.remove();
   if (timer) {clearTimeout(timer)}
 
   renderer = new Renderer({ dpr: 2 });
