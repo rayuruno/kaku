@@ -16,7 +16,7 @@ let $main = document.querySelector('main'),
 
 window.addEventListener('update', () => {
   if(location.hash != $kanji.value) {
-    location.hash = $kanji.value;
+    location.hash = encodeURIComponent($kanji.value);
   }
   update();
 });
